@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Task;
 
 class TaskController extends Controller
 {
@@ -14,7 +15,7 @@ class TaskController extends Controller
      */
     public function index()
     {
-        //
+        return Task::all();
     }
 
     /**
@@ -35,7 +36,15 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validatedData = $request->validate([
+            'title' => 'required|max:100',
+            'description' => 'required|max:230',
+            'completed'  => 'required|boolean'
+        ]);
+
+        $task = Task::create($validatedData);
+
+        return response()->json(['message' => 'Task created successfully','data' => $task], 201);
     }
 
     /**
@@ -46,7 +55,13 @@ class TaskController extends Controller
      */
     public function show($id)
     {
-        //
+        $task = Task::findOrFail($id);
+
+        if (!$task) {
+            return response()->json(['message' => 'Task not found'], 404);  
+        }
+
+        return $task;
     }
 
     /**
@@ -69,7 +84,49 @@ class TaskController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $task = Task::findOrFail($id);
+
+        if (!$task) {
+            return response()->json(['message' => 'Task not found'], 404);  
+        }
+
+        $validatedData = $request->validate([
+            'title' => 'required|max:100',
+            'description' => 'required|max:230',
+            'completed'  => 'required|boolean'
+        ]);
+
+        $task->update($validatedData);
+
+        $task = Task::findOrFail($id);
+
+        return response()->json(['message' => 'Task updated successfully', 'data' => $task], 202);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function updateCompleted(Request $request, $id)
+    {
+        $task = Task::findOrFail($id);
+
+        if (!$task) {
+            return response()->json(['message' => 'Task not found'], 404);  
+        }
+
+        $validatedData = $request->validate([
+            'completed'  => 'required|boolean',
+        ]);
+
+        $task->update($validatedData);
+
+        $task = Task::findOrFail($id);
+
+        return response()->json(['message' => 'Task updated successfully', 'data' => $task], 202);
     }
 
     /**
@@ -80,6 +137,14 @@ class TaskController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $task = Task::findOrFail($id);
+
+        if (!$task) {
+            return response()->json(['message' => 'Task not found'], 404);  
+        }
+
+        $task->delete();
+
+        return response()->json(['message' => 'Task deleted successfully'], 200);
     }
 }
