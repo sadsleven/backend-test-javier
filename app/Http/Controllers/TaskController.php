@@ -15,12 +15,7 @@ class TaskController extends Controller
      */
     public function index()
     {
-        $tasks = Task::all()->map(function ($task) {
-            $task->completed = (bool) $task->completed;
-            return $task;
-        });
-        
-        return $tasks;
+        return Task::all();
     }
 
     /**
@@ -110,8 +105,6 @@ class TaskController extends Controller
         $task->update($validatedData);
 
         $task = Task::find($id);
-
-        $task->completed = (bool) $task->completed;
 
         // Retorno de la tarea actualizada
 
