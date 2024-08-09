@@ -15,7 +15,12 @@ class TaskController extends Controller
      */
     public function index()
     {
-        return Task::all();
+        $tasks = Task::all()->map(function ($task) {
+            $task->completed = (bool) $task->completed;
+            return $task;
+        });
+        
+        return $tasks;
     }
 
     /**
@@ -42,8 +47,10 @@ class TaskController extends Controller
             'completed'  => 'required|boolean'
         ]);
 
+        // Si valido los datos crea
         $task = Task::create($validatedData);
 
+        // Retorno de la tarea creada
         return response()->json(['message' => 'Task created successfully','data' => $task], 201);
     }
 
@@ -55,12 +62,14 @@ class TaskController extends Controller
      */
     public function show($id)
     {
-        $task = Task::findOrFail($id);
+        $task = Task::find($id);
 
         if (!$task) {
-            return response()->json(['message' => 'Task not found'], 404);  
+            // Si no consigue la tarea a mostrar
+            return response()->json(['message' => 'Task not found'], 404);
         }
 
+        // Retorno de la tarea
         return $task;
     }
 
@@ -84,10 +93,11 @@ class TaskController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $task = Task::findOrFail($id);
+        $task = Task::find($id);
 
         if (!$task) {
-            return response()->json(['message' => 'Task not found'], 404);  
+            // Si no consigue la tarea a editar
+            return response()->json(['message' => 'Task not found'], 404);
         }
 
         $validatedData = $request->validate([
@@ -96,9 +106,14 @@ class TaskController extends Controller
             'completed'  => 'required|boolean'
         ]);
 
+        // Si valido los datos actualiza
         $task->update($validatedData);
 
-        $task = Task::findOrFail($id);
+        $task = Task::find($id);
+
+        $task->completed = (bool) $task->completed;
+
+        // Retorno de la tarea actualizada
 
         return response()->json(['message' => 'Task updated successfully', 'data' => $task], 202);
     }
@@ -112,20 +127,23 @@ class TaskController extends Controller
      */
     public function updateCompleted(Request $request, $id)
     {
-        $task = Task::findOrFail($id);
+        $task = Task::find($id);
 
         if (!$task) {
-            return response()->json(['message' => 'Task not found'], 404);  
+            // Si no consigue la tarea a editar
+            return response()->json(['message' => 'Task not found'], 404);
         }
 
         $validatedData = $request->validate([
             'completed'  => 'required|boolean',
         ]);
 
+        // Si valido los datos actualiza
         $task->update($validatedData);
 
-        $task = Task::findOrFail($id);
+        $task = Task::find($id);
 
+        // Retorno de la tarea actualizada
         return response()->json(['message' => 'Task updated successfully', 'data' => $task], 202);
     }
 
@@ -137,12 +155,14 @@ class TaskController extends Controller
      */
     public function destroy($id)
     {
-        $task = Task::findOrFail($id);
+        $task = Task::find($id);
 
         if (!$task) {
-            return response()->json(['message' => 'Task not found'], 404);  
+            // Si no consigue la tarea a borrar
+            return response()->json(['message' => 'Task not found'], 404);
         }
 
+        // Borrando la tarea y el mensaje de exito
         $task->delete();
 
         return response()->json(['message' => 'Task deleted successfully'], 200);

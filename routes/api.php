@@ -15,6 +15,8 @@ use App\Http\Controllers\TaskController;
 |
 */
 
+// Rutas para listar, obtener, crear, editar y eliminar tareas
+
 Route::get('/task', [TaskController::class, 'index']);
 
 Route::post('/task', [TaskController::class, 'store']);
@@ -23,6 +25,6 @@ Route::get('/task/{id}', [TaskController::class, 'show']);
 
 Route::put('/task/{id}', [TaskController::class, 'update']);
 
-Route::patch('/task/{id}', [TaskController::class, 'updateCompleted']);
+Route::patch('/task-complete/{id}', [TaskController::class, 'updateCompleted']);
 
 Route::delete('/task/{id}', [TaskController::class, 'destroy']);
